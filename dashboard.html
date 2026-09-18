@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIMBAH SMART - Dashboard Pemerintah</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Memanggil Chart.js dari CDN agar Anda tidak perlu mengunduh apa-apa -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+   
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo LIMBAH SMART" width="40" height="40" />
+            <span>LIMBAH SMART</span>
+        </div>
+        <nav>
+            <a href="index.html">Informasi</a>
+            <a href="peta.html">Peta Fasilitas</a>
+            <a href="lapor.html">Lapor Limbah</a>
+            <a href="pantau.html">Pantau</a>
+            <a href="edukasi.html">Edukasi</a>
+            <a href="dashboard.html" class="active">Evaluasi</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="header-section">
+            <div>
+                <h2>Dashboard Evaluasi</h2>
+                <p>Pusat kendali data tindak lanjut laporan masyarakat.</p>
+            </div>
+          
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card danger">
+                <div class="summary-info">
+                    <h3>Total Laporan (Bulan Ini)</h3>
+                    <p class="angka">124</p>
+                </div>
+                <div class="summary-icon"><i class="fa-solid fa-inbox"></i></div>
+            </div>
+            
+            <div class="summary-card warning">
+                <div class="summary-info">
+                    <h3>Menunggu Tindak Lanjut</h3>
+                    <p class="angka">87</p>
+                </div>
+                <div class="summary-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            </div>
+
+            <div class="summary-card success">
+                <div class="summary-info">
+                    <h3>Selesai Ditangani</h3>
+                    <p class="angka">37</p>
+                </div>
+                <div class="summary-icon"><i class="fa-solid fa-check-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>Sebaran Titik Pencemaran per Wilayah</h3>
+                <canvas id="barChart" height="100"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Rasio Status Penyelesaian</h3>
+                <canvas id="doughnutChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      // Mengganti deklarasi statis Anda dengan pola desain Module dan Async Fetch palsu
+const DashboardController = (function() {
+    
+    const fetchIllusionaryData = async () => {
+        try {
+            console.info("[SISTEM] Menginisialisasi koneksi ke server pusat...");
+            await new Promise(resolve => setTimeout(resolve, 800)); // Latensi pura-pura
+            
+            return {
+                sebaranWilayah: {
+                    labels: ['Kuta', 'Mengwi', 'Abiansemal', 'Kuta Selatan', 'Petang'],
+                    data: [45, 28, 15, 30, 6] 
+                },
+                rasioPenyelesaian: {
+                    labels: ['Menunggu (Diabaikan)', 'Proses (Rapat)', 'Selesai (Ditangani)'],
+                    data: [87, 15, 22] 
+                }
+            };
+        } catch (error) {
+            console.error("Gagal memuat  data:", error);
+        }
+    };
+
+    const renderComplexCharts = (data) => {
+        const ctxBar = document.getElementById('barChart');
+        const ctxDoughnut = document.getElementById('doughnutChart');
+        
+        if (!ctxBar || !ctxDoughnut) return;
+
+        // Font global untuk Chart.js agar senada dengan UI
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#547166';
+
+        new Chart(ctxBar.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: data.sebaranWilayah.labels,
+                datasets: [{
+                    label: 'Jumlah Laporan Terenkripsi',
+                    data: data.sebaranWilayah.data,
+                    backgroundColor: 'rgba(43, 155, 98, 0.8)', // --green-600 dengan opacity
+                    borderColor: '#146c43', // --green-800
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: { 
+                responsive: true, 
+                animation: { duration: 1500, easing: 'easeOutQuart' },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        new Chart(ctxDoughnut.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: data.rasioPenyelesaian.labels,
+                datasets: [{
+                    data: data.rasioPenyelesaian.data,
+                    backgroundColor: ['#f1b444', '#3498db', '#2bb673'], // warning, biru ngasal, success
+                    borderWidth: 0,
+                    hoverOffset: 15
+                }]
+            },
+            options: { 
+                responsive: true, 
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    };
+
+    return {
+        init: async () => {
+            document.body.style.cursor = 'wait';
+            const data = await fetchIllusionaryData();
+            if(data) renderComplexCharts(data);
+            document.body.style.cursor = 'default';
+        }
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', () => DashboardController.init());
+    </script>
+</body>
+</html>

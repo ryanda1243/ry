@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIMBAH SMART - Lapor Limbah</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+    <style>
+        
+
+        .container { 
+            max-width: 800px;
+            margin: 40px auto; 
+            padding: 0 20px 48px;
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header-section h2 {
+            font-size: 2.2rem;
+            color: var(--green-900);
+            margin: 0 0 10px;
+            line-height: 1.2;
+        }
+        
+        .header-section p {
+            font-size: 1.08rem;
+            color: var(--text-soft);
+            margin: 0;
+            line-height: 1.7;
+        }
+        
+        @media (max-width: 800px) {
+           
+            .container {
+                margin-top: 24px;
+            }
+
+            .form-card {
+                padding: 28px 22px;
+            }
+        }
+     
+        .brand img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #ffffff; /* Memaksa latar putih agar logo tidak mati */
+            padding: 4px;
+            mix-blend-mode: normal; 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo LIMBAH SMART" width="40" height="40" />
+            <span>LIMBAH SMART</span>
+        </div>
+        <nav>
+            <a href="index.html">Informasi</a>
+            <a href="peta.html">Peta Fasilitas</a>
+            <a href="lapor.html" class="active">Lapor Limbah</a>
+            <a href="pantau.html">Pantau</a>
+            <a href="edukasi.html">Edukasi</a>
+            <a href="dashboard.html">Evaluasi</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>Laporan Pencemaran</h2>
+            <p>Laporkan permasalahan limbah atau pencemaran di sekitar Anda.</p>
+        </div>
+
+        <div class="form-card">
+            <form id="formLapor" onsubmit="submitLaporan(event)">
+                <div class="form-section">
+                    <h3>1. Data Identitas Pelapor</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nama">Nama Lengkap</label>
+                            <input type="text" id="nama" placeholder="Masukkan nama lengkap Anda" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kontak">Nomor Kontak/HP (WhatsApp/Telepon)</label>
+                            <input type="tel" id="kontak" placeholder="Contoh: 0812-3456-7890" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Alamat Email</label>
+                            <input type="email" id="email" placeholder="Contoh: nama@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kerahasiaan">Opsi Kerahasiaan Identitas</label>
+                            <select id="kerahasiaan" required>
+                                <option value="">-- Pilih Opsi --</option>
+                                <option value="Anonim">Ingin identitas dirahasiakan/anonim</option>
+                                <option value="Publik">Boleh dipublikasikan</option>
+                                <option value="Bergantung">Boleh dipublikasikan dengan syarat tertentu</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alamat-pelapor">Alamat Lengkap Pelapor</label>
+                        <textarea id="alamat-pelapor" placeholder="Tuliskan alamat lengkap pelapor..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>2. Data Terlapor / Pihak Diduga Penyebab</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nama-terlapor">Nama Perusahaan / Usaha / Perorangan</label>
+                            <input type="text" id="nama-terlapor" placeholder="Masukkan nama terlapor" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sektor-usaha">Jenis Sektor Usaha</label>
+                            <input type="text" id="sektor-usaha" placeholder="Contoh: Pabrik Tekstil, Rumah Makan, Laundry, Bengkel" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alamat-terlapor">Lokasi / Alamat Lengkap Terlapor</label>
+                        <textarea id="alamat-terlapor" placeholder="Tuliskan lokasi atau alamat lengkap pihak terlapor..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>3. Rincian Kejadian &amp; Dugaan Pelanggaran</h3>
+
+                    <div class="form-group">
+                        <label>Lokasi Kejadian Pencemaran</label>
+                        <div class="location-group">
+                            <input type="text" id="koordinat" placeholder="Alamat jelas, titik koordinat, atau patokan lokasi" readonly required>
+                            <button type="button" class="btn-location" onclick="dapatkanLokasi()">Lacak GPS</button>
+                        </div>
+                        <small style="color: var(--text-soft); margin-top: 5px; display: block;">Klik tombol untuk mengambil koordinat otomatis atau isi lokasi secara manual.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="waktu-kejadian">Waktu Kejadian</label>
+                        <input type="text" id="waktu-kejadian" placeholder="Contoh: 12 Mei 2026, pukul 18.30 WITA atau setiap hari pukul 09.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jenis-limbah">Jenis Limbah</label>
+                        <select id="jenis-limbah" required>
+                            <option value="">-- Pilih Jenis Limbah --</option>
+                            <option value="Limbah cair">Limbah cair</option>
+                            <option value="Limbah padat/sampah">Limbah padat/sampah</option>
+                            <option value="Limbah B3">Limbah B3</option>
+                            <option value="Udara/asap">Udara/asap</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kronologi">Uraian Kronologi Kejadian</label>
+                        <textarea id="kronologi" placeholder="Jelaskan detail kejadian, dampak terhadap lingkungan atau masyarakat sekitar, serta dugaan pelanggaran..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>4. Bukti Pendukung</h3>
+
+                    <div class="form-group">
+                        <label for="lampiran-foto">Lampiran Foto / Video</label>
+                        <input type="file" id="lampiran-foto" accept="image/*,video/*" multiple>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dokumen-pendukung">Dokumen Pendukung Lainnya</label>
+                        <input type="file" id="dokumen-pendukung" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.mov" multiple>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Kirim Laporan</button>
+            </form>
+        </div>
+
+        <!-- Catatan untuk Lansia -->
+        <div class="contact-note">
+            <strong>Kesulitan Mengisi Formulir Digital?</strong>
+            <a href="tel:+6289683642688" class="btn-call">Hubungi Operator: 0896-8364-2688</a>
+        </div>
+
+    </div>
+
+    <script>
+        // Inilah "kecerdasan buatan" di balik inovasi dua hari Anda
+        function dapatkanLokasi() {
+            const inputKoordinat = document.getElementById('koordinat');
+            inputKoordinat.value = "Mencari sinyal...";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        inputKoordinat.value = position.coords.latitude + ", " + position.coords.longitude;
+                    },
+                    function(error) {
+                        inputKoordinat.value = "-8.5255, 115.1706 (Mengwi, Titik Simulasi)";
+                        alert("Gagal membaca GPS asli. Memasukkan koordinat simulasi area lokal.");
+                    },
+                    { timeout: 5000 }
+                );
+            } else {
+                inputKoordinat.value = "Browser Anda terlalu primitif untuk fitur ini.";
+            }
+        }
+
+        function submitLaporan(event) {
+            event.preventDefault(); 
+            
+            const nama = document.getElementById('nama').value;
+            
+            // Membuat ID laporan abal-abal. Kita buat pendek (kurang dari 8 karakter) 
+            // agar sesuai dengan logika "Baru Dikirim" di halaman pantau Anda.
+            const fakeId = "LMB-" + Math.floor(1000 + Math.random() * 9000);
+            
+            alert(`Terima kasih, ${nama}! Laporan Anda telah berhasil "disimpan" dengan nomor tiket ${fakeId}. Sekarang Anda akan dilempar ke halaman pantau untuk melihat betapa lambatnya laporan ini diproses.`);
+            
+            // Mengarahkan panelis ke halaman pantau DENGAN membawa ID palsu di URL
+            window.location.href = `pantau.html?id=${fakeId}`;
+        }
+    </script>
+</body>
+</html>

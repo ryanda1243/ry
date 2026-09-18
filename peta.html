@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LIMBAH SMART - Peta Fasilitas</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+       
+        
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: var(--green-50);
+            color: var(--text);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo LIMBAH SMART" width="40" height="40" />
+            <span>LIMBAH SMART</span>
+        </div>
+
+        <nav>
+            <a href="index.html">Informasi</a>
+            <a href="peta.html" class="active">Peta Fasilitas</a>
+            <a href="lapor.html">Lapor Limbah</a>
+            <a href="pantau.html">Pantau</a>
+            <a href="edukasi.html">Edukasi</a>
+            <a href="dashboard.html">Evaluasi</a>
+        </nav>
+    </header>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Direktori Fasilitas</h2>
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari lokasi atau fasilitas" />
+                </div>
+
+                <select id="typeFilter" class="filter-select">
+                    <option value="all">Semua kategori</option>
+                    <option value="ipal">Bank Sampah Tabanan</option>
+                    <option value="banksampah">Bank sampah</option>
+                    <option value="sedotwc">Armada sanitasi</option>
+                </select>
+            </div>
+
+            <div class="facility-list" id="facilityList"></div>
+        </aside>
+
+        <main class="map-area">
+            <div class="floating-card">
+                <div class="label">Status jaringan</div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <strong id="statTotal">0</strong>
+                        <span>Total</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="statActive" style="color: var(--success);">0</strong>
+                        <span>Normal</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="statWarn" style="color: var(--warning);">0</strong>
+                        <span>Waspada</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="statErr" style="color: var(--danger);">0</strong>
+                        <span>Kritis</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="liveGpsBtn" class="live-gps-btn">
+                <i class="fa-solid fa-location-crosshairs"></i> <span id="liveBtnText">Aktifkan Live GPS</span>
+            </button>
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+       const data = [
+    { 
+        id: 1, 
+        name: 'DLHK Kota Denpasar', 
+        type: 'ipal', 
+        typeLabel: 'Instansi Pemerintah', 
+        icon: 'fa-building', 
+        status: 'normal', 
+        statusText: 'Buka - Jam Kerja', 
+        desc: 'Dinas Lingkungan Hidup dan Kebersihan Kota Denpasar (Gedung Sewaka Dharma, Lumintang).', 
+        lat: -8.6318, 
+        lng: 115.2109 
+    },
+    { 
+        id: 2, 
+        name: 'DLHK Kabupaten Tabanan', 
+        type: 'ipal', 
+        typeLabel: 'Instansi Pemerintah', 
+        icon: 'fa-building', 
+        status: 'normal', 
+        statusText: 'Buka - Jam Kerja', 
+        desc: 'Dinas Lingkungan Hidup Kabupaten Tabanan, berlokasi di Jl. Pahlawan No.1 A, Delod Peken.', 
+        lat: -8.5414, 
+        lng: 115.1245 
+    }
+];
+
+       const map = L.map('map', { zoomControl: true, attributionControl: true }).setView([-8.5800, 115.1600], 11);
+        L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        }).addTo(map);
+
+        map.scrollWheelZoom.disable();
+
+        const listContainer = document.getElementById('facilityList');
+        const markers = [];
+
+        function updateStats(filteredData) {
+            document.getElementById('statTotal').textContent = filteredData.length;
+            document.getElementById('statActive').textContent = filteredData.filter(item => item.status === 'normal').length;
+            document.getElementById('statWarn').textContent = filteredData.filter(item => item.status === 'warning').length;
+            document.getElementById('statErr').textContent = filteredData.filter(item => item.status === 'error').length;
+        }
+        let userMarker = null;
+        let watchId = null;
+        let currentLat = null;
+        let currentLng = null;
+        let routingControl = null;
+        const liveBtn = document.getElementById('liveGpsBtn');
+        const liveBtnText = document.getElementById('liveBtnText');
+
+        const userIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [0, -41], shadowSize: [41, 41]
+        });
+
+        liveBtn.addEventListener('click', () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                if (userMarker) map.removeLayer(userMarker);
+                userMarker = null;
+                liveBtn.classList.remove('active-live');
+                liveBtnText.textContent = 'Aktifkan Live GPS';
+                alert('Live GPS dimatikan.');
+                return;
+            }
+
+            if (!navigator.geolocation) {
+                alert('Browser Anda tidak mendukung Geolocation.');
+                return;
+            }
+
+            liveBtn.classList.add('active-live');
+            liveBtnText.textContent = 'Matikan Live GPS';
+
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const accuracy = pos.coords.accuracy;
+                    currentLat = lat;
+                    currentLng = lng;
+
+                    if (!userMarker) {
+                        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+                        userMarker.bindPopup(`<b>Posisi Anda Sekarang (Live)</b><br>Akurasi: ±${Math.round(accuracy)}m`);
+                        map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
+                    } else {
+                        userMarker.setLatLng([lat, lng]);
+                        userMarker.getPopup().setContent(`<b>Posisi Anda Sekarang (Live)</b><br>Akurasi: ±${Math.round(accuracy)}m`);
+                    }
+                },
+                (err) => {
+                    console.error(err);
+                    alert('Gagal melacak posisi live. Pastikan izin lokasi (GPS) di HP/Laptop diaktifkan!');
+                },
+                { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+            );
+        });
+        
+        // Fungsi ini akan menyelamatkan peta Anda dari predikat "sekadar pajangan"
+window.buatRute = function(destLat, destLng) {
+    if (!currentLat || !currentLng) {
+        alert("Nyalakan fitur Live GPS Terlebih Dahulu! ");
+        return;
+    }
+    
+    // Hapus rute lama kalau ada, supaya peta tidak tampak seperti benang kusut
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
+    
+    // Mulai menggambar rute
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(currentLat, currentLng),
+            L.latLng(destLat, destLng)
+        ],
+        routeWhileDragging: false,
+        lineOptions: {
+            styles: [{color: '#e74c3c', opacity: 0.8, weight: 6}]
+        },
+        createMarker: function() { return null; } // Menghindari marker ganda yang norak
+    }).addTo(map);
+    
+    // Tutup semua popup agar tampilan bersih saat rute dibuat
+    map.closePopup();
+};
+
+        function renderFacilities() {
+            const filterType = document.getElementById('typeFilter').value;
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            markers.forEach(item => map.removeLayer(item.marker));
+            markers.length = 0;
+            listContainer.innerHTML = '';
+
+            const filteredData = data.filter(item => {
+                const matchesType = filterType === 'all' || item.type === filterType;
+                const matchesText = item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
+                return matchesType && matchesText;
+            });
+
+            updateStats(filteredData);
+
+            if (!filteredData.length) {
+                listContainer.innerHTML = `
+                    <div style="padding: 30px 12px; text-align: center; color: var(--text-soft);">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <div>Fasilitas tidak ditemukan.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredData.forEach(facility => {
+                const color = facility.status === 'error' ? 'red' : facility.status === 'warning' ? 'gold' : 'green';
+                const icon = new L.Icon({
+                    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+
+                const marker = L.marker([facility.lat, facility.lng], { icon }).addTo(map);
+                marker.bindPopup(`
+                    <div class="popup-header"><i class="fa-solid ${facility.icon}"></i> ${facility.name}</div>
+                    <div class="popup-body">
+                        <div><strong>Status:</strong> ${facility.statusText}</div>
+                        <div style="margin-top: 8px;">${facility.desc}</div>
+                        <button onclick="buatRute(${facility.lat}, ${facility.lng})" style="margin-top:12px; background:#1d7a4d; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.1);">Cari Rute Terdekat</button>
+                    </div>
+                `);
+
+                markers.push({ id: facility.id, marker });
+
+                const item = document.createElement('div');
+                item.className = 'facility-item';
+                item.innerHTML = `
+                    <div class="facility-header">
+                        <h4>${facility.name}</h4>
+                        <span class="status-dot status-${facility.status}" title="${facility.statusText}"></span>
+                    </div>
+                    <p>${facility.desc}</p>
+                    <div class="badge-group">
+                        <span class="badge ${facility.type}"><i class="fa-solid ${facility.icon}"></i> ${facility.typeLabel}</span>
+                    </div>
+                `;
+
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.facility-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                    map.flyTo([facility.lat, facility.lng], 15, { animate: true, duration: 1.1 });
+                    marker.openPopup();
+                });
+
+                listContainer.appendChild(item);
+            });
+        }
+
+        document.getElementById('typeFilter').addEventListener('change', renderFacilities);
+        document.getElementById('searchInput').addEventListener('input', renderFacilities);
+
+        renderFacilities();
+
+        
+    </script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+</body>
+</html>

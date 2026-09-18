@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIMBAH SMART - Pantau Laporan</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo LIMBAH SMART" width="40" height="40" />
+            <span>LIMBAH SMART</span>
+        </div>
+        <nav>
+            <a href="index.html">Informasi</a>
+            <a href="peta.html">Peta Fasilitas</a>
+            <a href="lapor.html">Lapor Limbah</a>
+            <a href="pantau.html" class="active">Pantau</a>
+            <a href="edukasi.html">Edukasi</a>
+            <a href="dashboard.html">Evaluasi</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>Lacak Status Laporan</h2>
+            <p>Masukkan ID Laporan Anda untuk memantau sejauh mana birokrasi bekerja hari ini.</p>
+        </div>
+
+        <div class="search-card">
+            <form id="formCari" onsubmit="cariLaporan(event)">
+                <div class="search-group">
+                    <input type="text" id="idLaporan" class="search-input" placeholder="Contoh: LMBH-2026-09A1" required>
+                    <button type="submit" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i> Lacak</button>
+                </div>
+            </form>
+            <div id="loading" class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Membongkar arsip pemerintah...</div>
+        </div>
+
+        <div class="tracking-result" id="trackingResult">
+            <div class="tracking-header">
+                <h3>Hasil Pencarian: <span id="resId"></span></h3>
+                <p>Status terakhir diperbarui pada sistem pusat (atau setidaknya begitu pengakuannya).</p>
+            </div>
+
+            <div class="stepper">
+                <div class="stepper-progress" id="progressLine"></div>
+                
+                <div class="step" id="step1">
+                    <div class="circle"><i class="fa-solid fa-paper-plane"></i></div>
+                    <div class="label">Dikirim</div>
+                    <div class="desc">Laporan diterima server.</div>
+                </div>
+                
+                <div class="step" id="step2">
+                    <div class="circle"><i class="fa-solid fa-gears"></i></div>
+                    <div class="label">Diproses</div>
+                    <div class="desc">Sedang dirapatkan sambil minum kopi.</div>
+                </div>
+                
+                <div class="step" id="step3">
+                    <div class="circle"><i class="fa-solid fa-check"></i></div>
+                    <div class="label">Selesai</div>
+                    <div class="desc">Dianggap beres secara administratif.</div>
+                </div>
+            </div>
+
+            <ul class="log-list" id="logList">
+                <!-- Log riwayat akan dimunculkan oleh JS -->
+            </ul>
+        </div>
+    </div>
+
+ <script>
+        // Fungsi untuk menangkap parameter 'id' dari URL saat halaman pertama kali dimuat
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idDariURL = urlParams.get('id');
+            
+            // Jika ada ID dari halaman lapor, otomatis isi form dan jalankan pencarian
+            if(idDariURL) {
+                document.getElementById('idLaporan').value = idDariURL;
+                // Memaksa form untuk submit agar animasi loading fiktif Anda berjalan
+                document.getElementById('formCari').dispatchEvent(new Event('submit'));
+            }
+        };
+
+        // Simulasi logika bodong yang sengaja dirancang agar terlihat seperti sistem sungguhan
+        function cariLaporan(event) {
+            event.preventDefault();
+            const inputId = document.getElementById('idLaporan').value.trim();
+            const loading = document.getElementById('loading');
+            const resultDiv = document.getElementById('trackingResult');
+            
+            // Reset UI
+            resultDiv.style.display = 'none';
+            loading.style.display = 'block';
+
+            // Memberikan ilusi seolah-olah sedang melakukan query ke database berat
+            setTimeout(() => {
+                loading.style.display = 'none';
+                tampilkanHasil(inputId);
+            }, 1200);
+        }
+
+        function tampilkanHasil(id) {
+            document.getElementById('resId').innerText = id;
+            document.getElementById('trackingResult').style.display = 'block';
+
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const progressLine = document.getElementById('progressLine');
+            const logList = document.getElementById('logList');
+
+            // Reset class
+            step1.className = 'step';
+            step2.className = 'step';
+            step3.className = 'step';
+            logList.innerHTML = '';
+
+            // Membuat logika fiktif berdasarkan panjang karakter ID agar statusnya seolah-olah dinamis
+            const charLength = id.length;
+
+            if (charLength < 8) {
+                // Skenario 1: Baru Dikirim (Ini yang akan terpicu dari ID palsu LMB-XXXX dari halaman lapor)
+                step1.classList.add('completed');
+                progressLine.style.width = '0%';
+                logList.innerHTML = `
+                    <li><div class="log-date">Sistem</div><div class="log-text">Laporan diterima dan tiket dibuat. Menunggu validasi petugas.</div></li>
+                `;
+            } else if (charLength >= 8 && charLength <= 12) {
+                // Skenario 2: Sedang Diproses (Stuck)
+                step1.classList.add('completed');
+                step2.classList.add('active');
+                progressLine.style.width = '50%';
+                logList.innerHTML = `
+                    <li><div class="log-date">Hari ini</div><div class="log-text">Petugas lapangan sedang memverifikasi lokasi pencemaran (atau sedang berteduh dari hujan).</div></li>
+                    <li><div class="log-date">Kemarin</div><div class="log-text">Laporan diteruskan ke Dinas Lingkungan Hidup.</div></li>
+                    <li><div class="log-date">2 Hari Lalu</div><div class="log-text">Laporan diterima server.</div></li>
+                `;
+            } else {
+                // Skenario 3: Selesai
+                step1.classList.add('completed');
+                step2.classList.add('completed');
+                step3.classList.add('completed');
+                progressLine.style.width = '100%';
+                logList.innerHTML = `
+                    <li><div class="log-date">Hari ini</div><div class="log-text">Pembersihan selesai dilakukan. Laporan ditutup (semoga tidak terjadi lagi besok).</div></li>
+                    <li><div class="log-date">Kemarin</div><div class="log-text">Tim kebersihan diturunkan ke titik koordinat.</div></li>
+                    <li><div class="log-date">3 Hari Lalu</div><div class="log-text">Laporan diterima server.</div></li>
+                `;
+            }
+            
+            // Bersihkan URL dari parameter agar saat direfresh tidak mengulang animasi secara norak
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+</body>
+</html>
