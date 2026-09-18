@@ -24,6 +24,37 @@
             display: flex;
             flex-direction: column;
         }
+        /* Mengecilkan & merampingkan kotak status jaringan di HP */
+@media (max-width: 800px) {
+    .floating-card {
+        top: 10px;
+        right: 10px;
+        width: auto;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .floating-card .label {
+        display: none; /* Sembunyikan teks label judul */
+    }
+
+    .floating-card .stats {
+        display: flex;
+        gap: 8px;
+    }
+
+    .floating-card .stat-box {
+        padding: 4px 8px;
+    }
+
+    .floating-card .stat-box strong {
+        font-size: 1rem;
+    }
+
+    .floating-card .stat-box span {
+        font-size: 0.6rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -55,9 +86,9 @@
 
                 <select id="typeFilter" class="filter-select">
                     <option value="all">Semua kategori</option>
-                    <option value="ipal">Bank Sampah Tabanan</option>
-                    <option value="banksampah">Bank sampah</option>
-                    <option value="sedotwc">Armada sanitasi</option>
+                    <option value="ipal">DLHK Tabanan</option>
+                    <option value="banksampah">DLHK Denpasar</option>
+                   
                 </select>
             </div>
 
@@ -100,7 +131,7 @@
     { 
         id: 1, 
         name: 'DLHK Kota Denpasar', 
-        type: 'ipal', 
+        type: 'banksampah', 
         typeLabel: 'Instansi Pemerintah', 
         icon: 'fa-building', 
         status: 'normal', 
@@ -196,7 +227,7 @@
                     console.error(err);
                     alert('Gagal melacak posisi live. Pastikan izin lokasi (GPS) di HP/Laptop diaktifkan!');
                 },
-                { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                { enableHighAccuracy: true, maximumAge: 10000, timeout:20000 }
             );
         });
         
@@ -302,9 +333,11 @@ window.buatRute = function(destLat, destLng) {
             });
         }
 
-        document.getElementById('typeFilter').addEventListener('change', renderFacilities);
+        // Tambahkan 2 baris ini di bagian paling bawah tag <script> sebelum baris renderFacilities();
         document.getElementById('searchInput').addEventListener('input', renderFacilities);
+        document.getElementById('typeFilter').addEventListener('change', renderFacilities);
 
+// Panggilan awal saat halaman dimuat
         renderFacilities();
 
         

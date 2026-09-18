@@ -216,7 +216,7 @@
                         inputKoordinat.value = "-8.5255, 115.1706 (Mengwi, Titik Simulasi)";
                         alert("Gagal membaca GPS asli. Memasukkan koordinat simulasi area lokal.");
                     },
-                    { timeout: 5000 }
+                    { timeout: 20000 } // Timeout 20 detik
                 );
             } else {
                 inputKoordinat.value = "Browser Anda terlalu primitif untuk fitur ini.";

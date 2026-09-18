@@ -10,7 +10,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
-   
+   <style>
+   /* RESPONSIVITAS MOBILE UNTUK DASHBOARD EVALUASI */
+@media (max-width: 800px) {
+    /* Ubah 3 kartu ringkasan dari berjejer menjadi menumpuk ke bawah */
+    .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Ubah tata letak grafik dari 2 kolom menjadi 1 kolom */
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Sesuaikan ukuran font & padding agar tidak terlalu padat di HP */
+    .summary-info .angka {
+        font-size: 2.2rem;
+    }
+
+    .header-section h2 {
+        font-size: 1.8rem;
+    }
+}
+   </style>
 </head>
 <body>
 
