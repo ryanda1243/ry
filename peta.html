@@ -127,7 +127,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-       const data = [
+      const data = [
     { 
         id: 1, 
         name: 'DLHK Kota Denpasar', 
@@ -143,7 +143,7 @@
     { 
         id: 2, 
         name: 'DLHK Kabupaten Tabanan', 
-        type: 'ipal', 
+        type: 'banksampah', 
         typeLabel: 'Instansi Pemerintah', 
         icon: 'fa-building', 
         status: 'normal', 
@@ -151,9 +151,57 @@
         desc: 'Dinas Lingkungan Hidup Kabupaten Tabanan, berlokasi di Jl. Pahlawan No.1 A, Delod Peken.', 
         lat: -8.5414, 
         lng: 115.1245 
+    },
+  
+    { 
+        id: 3, 
+        name: 'TPS3R Uma Asri Ubung Kaja', 
+        type: 'TPS3R', 
+        typeLabel: 'Fasilitas Pengolahan', 
+        icon: 'fa-recycle', 
+        status: 'normal', 
+        statusText: 'Beroperasi', 
+        desc: 'TPS3R Uma Asri Ubung Kaja berlokasi di Ubung Kaja, Kec. Denpasar Utara, Kota Denpasar, Bali 80116', 
+        lat: -8.62573571938505, 
+        lng: 115.19321173839867 
+    },
+    { 
+        id: 4, 
+        name: 'TPS3R  Jagat Lestari Munggu', 
+        type: 'TPS3R', 
+        typeLabel: 'Fasilitas Pengolahan', 
+        icon: 'fa-recycle', 
+        status: 'normal', 
+        statusText: 'Sedang Penuh', 
+        desc: 'TPS3R Jagat Lestari Munggu berlokasi di 948F+7GF, Munggu, Kec. Mengwi, Kabupaten Badung, Bali 80351', 
+        lat: -8.634110539271953, 
+        lng: 115.12378852490698 
+    },
+    { 
+        id: 5, 
+        name: 'TPS3R  Seminyak Bali', 
+        type: 'TPS3R', 
+        typeLabel: 'Fasilitas Pengolahan', 
+        icon: 'fa-recycle', 
+        status: 'normal', 
+        statusText: 'Beroperasi', 
+        desc: 'TPS3R Seminyak Bali berlokasi di Jl. Beji Ayu No.10, Seminyak, Kec. Kuta, Kabupaten Badung, Bali 80361', 
+        lat: -8.693139907645756, 
+        lng: 115.17925648072729 
+    },
+    { 
+        id: 6, 
+        name: 'TPS3R  Sidakarya', 
+        type: 'TPS3R', 
+        typeLabel: 'Fasilitas Pengolahan', 
+        icon: 'fa-recycle', 
+        status: 'normal', 
+        statusText: 'Beroperasi', 
+        desc: 'TPS3R Sidakarya berlokasi di Jl. Kerta Dalem XXI, Sidakarya, Denpasar Selatan, Kota Denpasar, Bali 80224', 
+        lat: -8.69700, 
+        lng: 115.23520 , 
     }
 ];
-
        const map = L.map('map', { zoomControl: true, attributionControl: true }).setView([-8.5800, 115.1600], 11);
         L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
             maxZoom: 20,

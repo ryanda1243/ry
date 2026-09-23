@@ -79,6 +79,77 @@ mix-blend-mode: normal;
 color: #dff7e6;
 font-size: 1.1rem;
 }
+/* =========================================================
+   SESI KOTAK JENIS SAMPAH (Tolong jangan dirusak kodenya)
+   ========================================================= */
+.jenis-sampah {
+    margin: 40px 0;
+}
+
+.jenis-sampah h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #146c43; /* Warna hijau gelap yang mendadak Anda sukai */
+}
+
+.sampah-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Base Card Style */
+.sampah-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animasi mulus */
+}
+
+/* Animasi hover biar tidak kaku */
+.sampah-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.sampah-card h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+}
+
+.sampah-card p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Spesifik untuk Organik */
+.sampah-card.organik {
+    border-top: 5px solid #2bb673; /* Hijau cerah */
+}
+.sampah-card.organik h3 {
+    color: #2bb673;
+}
+
+/* Spesifik untuk Anorganik */
+.sampah-card.anorganik {
+    border-top: 5px solid #f1b444; /* Kuning/Oranye */
+}
+.sampah-card.anorganik h3 {
+    color: #f1b444;
+}
+
+.badge.TPS3R {
+    background-color: #e3f2fd; /* Biru muda */
+    color: #1976d2; /* Biru tua */
+    border: 1px solid #bbdefb;
+}
+
 
 /* NAVIGASI YANG KONSISTEN */
 nav {
